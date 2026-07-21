@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnBack = document.getElementById("btn-back");
 
   const TITLES = {
-    "screen-home": "Słówka",
+    "screen-home": "WordSnap",
     "screen-import": "Nowa talia",
     "screen-review": "Sprawdź słówka",
     "screen-setup": "Ustawienia nauki",
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.values(screens).forEach((el) => el.classList.remove("active"));
     screens[id].classList.add("active");
     currentScreenId = id;
-    topbarTitle.textContent = TITLES[id] || "Słówka";
+    topbarTitle.textContent = TITLES[id] || "WordSnap";
     btnBack.hidden = !BACK_TARGET[id];
   }
 

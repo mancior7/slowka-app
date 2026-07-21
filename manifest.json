@@ -1,6 +1,6 @@
 {
-  "name": "Słówka — nauka angielskiego",
-  "short_name": "Słówka",
+  "name": "WordSnap — nauka angielskiego",
+  "short_name": "WordSnap",
   "description": "Nauka angielskich słówek ze zdjęcia notatek, z powtórkami rozłożonymi w czasie.",
   "start_url": "./index.html",
   "scope": "./",
