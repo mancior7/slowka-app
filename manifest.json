@@ -1,0 +1,15 @@
+{
+  "name": "Słówka — nauka angielskiego",
+  "short_name": "Słówka",
+  "description": "Nauka angielskich słówek ze zdjęcia notatek, z powtórkami rozłożonymi w czasie.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f4",
+  "theme_color": "#2f6f5e",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
