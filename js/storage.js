@@ -84,5 +84,34 @@ const VocabStorage = (() => {
     saveAll(decks);
   }
 
-  return { getDecks, getDeck, createDeck, deleteDeck, addWords, updateWord, deleteWord, makeWord };
+  // Zapisuje nazwę i pełną listę słówek z ekranu edycji naraz: pary z `id`
+  // aktualizują istniejące słówka (stan powtórek zostaje), pary bez `id` to
+  // nowo dodane, a słówka, których nie ma na liście, zostają usunięte.
+  function saveDeckEdits(deckId, name, pairs) {
+    const decks = loadAll();
+    const deck = decks.find((d) => d.id === deckId);
+    if (!deck) return null;
+
+    deck.name = name.trim() || deck.name;
+
+    const keepIds = new Set(pairs.filter((p) => p.id).map((p) => p.id));
+    deck.words = deck.words.filter((w) => keepIds.has(w.id));
+
+    pairs.forEach((p) => {
+      if (p.id) {
+        const word = deck.words.find((w) => w.id === p.id);
+        if (word) {
+          word.en = p.en.trim();
+          word.pl = p.pl.trim();
+        }
+      } else {
+        deck.words.push(makeWord(p.en, p.pl));
+      }
+    });
+
+    saveAll(decks);
+    return deck;
+  }
+
+  return { getDecks, getDeck, createDeck, deleteDeck, addWords, updateWord, deleteWord, saveDeckEdits, makeWord };
 })();

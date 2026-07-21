@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedOrder: "random",
     selectedRounds: 1,
     session: null,
+    editingDeckId: null, // ustawione = zapis trafi do istniejącej talii, nie utworzy nowej
+    appendMode: false, // true = wynik importu dopisze się do pendingPairs zamiast je zastąpić
   };
 
   function showScreen(id) {
@@ -69,6 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.getElementById("btn-new-deck").addEventListener("click", () => {
+    state.editingDeckId = null;
+    state.appendMode = false;
+    state.pendingPairs = [];
+    document.getElementById("deck-name").value = "";
     document.getElementById("input-paste").value = "";
     document.getElementById("ocr-progress").hidden = true;
     showScreen("screen-import");
@@ -95,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       progressWrap.hidden = true;
       const pairs = VocabParser.parse(text);
-      openReview(pairs);
+      processParsedPairs(pairs);
     } catch (err) {
       progressWrap.hidden = true;
       alert("Nie udało się odczytać zdjęcia: " + err.message + "\nSpróbuj wkleić tekst ręcznie.");
@@ -109,15 +115,27 @@ document.addEventListener("DOMContentLoaded", () => {
       alert('Nie znalazłem żadnych par w formacie "słówko - tłumaczenie". Sprawdź format tekstu.');
       return;
     }
-    openReview(pairs);
+    processParsedPairs(pairs);
+  });
+
+  document.getElementById("btn-add-more-import").addEventListener("click", () => {
+    state.appendMode = true;
+    document.getElementById("input-paste").value = "";
+    document.getElementById("ocr-progress").hidden = true;
+    showScreen("screen-import");
   });
 
   // ===================== REVIEW =====================
-  function openReview(pairs) {
-    state.pendingPairs = pairs.length ? pairs : [{ en: "", pl: "" }];
-    document.getElementById("deck-name").value = "";
+  function updateReviewScreenLabels() {
+    topbarTitle.textContent = state.editingDeckId ? "Edytuj talię" : "Sprawdź słówka";
+    document.getElementById("btn-save-deck").textContent = state.editingDeckId ? "Zapisz zmiany" : "Zapisz talię";
+  }
+
+  function processParsedPairs(pairs) {
+    state.pendingPairs = state.appendMode ? state.pendingPairs.concat(pairs) : pairs.length ? pairs : [{ en: "", pl: "" }];
     renderReviewRows();
     showScreen("screen-review");
+    updateReviewScreenLabels();
   }
 
   function renderReviewRows() {
@@ -175,7 +193,12 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Dodaj przynajmniej jedną kompletną parę słówek.");
       return;
     }
-    VocabStorage.createDeck(name || "Talia bez nazwy", valid);
+    if (state.editingDeckId) {
+      VocabStorage.saveDeckEdits(state.editingDeckId, name || "Talia bez nazwy", valid);
+      state.editingDeckId = null;
+    } else {
+      VocabStorage.createDeck(name || "Talia bez nazwy", valid);
+    }
     renderDeckList();
     showScreen("screen-home");
   });
@@ -183,6 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===================== SETUP =====================
   function openSetup(deckId) {
     state.currentDeckId = deckId;
+    state.editingDeckId = null;
     const deck = VocabStorage.getDeck(deckId);
     document.getElementById("setup-deck-name").textContent = deck.name;
     const dueCount = deck.words.filter((w) => VocabSRS.isDue(w)).length;
@@ -190,6 +214,18 @@ document.addEventListener("DOMContentLoaded", () => {
       dueCount === 0 ? "Brak zaległych powtórek — możesz ćwiczyć wszystkie słówka." : `${dueCount} słówek czeka na powtórkę.`;
     showScreen("screen-setup");
   }
+
+  document.getElementById("btn-edit-words").addEventListener("click", () => {
+    const deck = VocabStorage.getDeck(state.currentDeckId);
+    if (!deck) return;
+    state.editingDeckId = deck.id;
+    state.appendMode = false;
+    state.pendingPairs = deck.words.map((w) => ({ id: w.id, en: w.en, pl: w.pl }));
+    document.getElementById("deck-name").value = deck.name;
+    renderReviewRows();
+    showScreen("screen-review");
+    updateReviewScreenLabels();
+  });
 
   document.getElementById("mode-picker").addEventListener("click", (e) => {
     const btn = e.target.closest(".segmented__opt");
