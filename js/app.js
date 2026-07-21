@@ -375,6 +375,31 @@ document.addEventListener("DOMContentLoaded", () => {
     return escapeHtml(str || "");
   }
 
+  // ===================== MOTYW (jasny/ciemny) =====================
+  const THEME_KEY = "vocab_theme";
+  const btnThemeToggle = document.getElementById("btn-theme-toggle");
+  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function applyTheme(theme) {
+    // theme: "dark" | "light" | null (null = podążaj za ustawieniem systemu)
+    if (theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    const isDark = theme ? theme === "dark" : systemPrefersDark.matches;
+    btnThemeToggle.textContent = isDark ? "☀️" : "🌙";
+  }
+
+  applyTheme(localStorage.getItem(THEME_KEY));
+
+  btnThemeToggle.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || (systemPrefersDark.matches ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  });
+
   // ===================== INIT =====================
   renderDeckList();
   showScreen("screen-home");

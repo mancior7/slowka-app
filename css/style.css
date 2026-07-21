@@ -7,9 +7,44 @@
   --accent: #2f6f5e;
   --accent-dark: #234f43;
   --danger: #c0392b;
-  --success: #2f6f5e;
+  --danger-bg: #fbe9e7;
+  --danger-border: #f3c9c2;
+  --success: var(--accent);
+  --success-bg: #e3f2ec;
+  --warning-bg: #fff4e5;
+  --warning-ink: #8a5a1c;
   --radius: 16px;
   --font: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131c19;
+    --surface: #1b2724;
+    --ink: #eef2ef;
+    --muted: #93a39c;
+    --border: #2b3a35;
+    --accent: #55a68f;
+    --accent-dark: #7cc4ae;
+    --danger: #e0776a;
+    --danger-bg: #3a2422;
+    --danger-border: #5a332e;
+    --success-bg: #1f3b32;
+    --warning-bg: #3a2f1c;
+    --warning-ink: #e3b56b;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131c19; --surface: #1b2724; --ink: #eef2ef; --muted: #93a39c; --border: #2b3a35;
+  --accent: #55a68f; --accent-dark: #7cc4ae;
+  --danger: #e0776a; --danger-bg: #3a2422; --danger-border: #5a332e;
+  --success-bg: #1f3b32; --warning-bg: #3a2f1c; --warning-ink: #e3b56b;
+}
+:root[data-theme="light"] {
+  --bg: #f5f7f4; --surface: #ffffff; --ink: #1c2321; --muted: #6b7570; --border: #e1e6e1;
+  --accent: #2f6f5e; --accent-dark: #234f43;
+  --danger: #c0392b; --danger-bg: #fbe9e7; --danger-border: #f3c9c2;
+  --success-bg: #e3f2ec; --warning-bg: #fff4e5; --warning-ink: #8a5a1c;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,8 +99,8 @@ input, textarea { font-family: inherit; }
 .btn-block { width: 100%; }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-secondary { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
-.btn-danger { background: #fbe9e7; color: var(--danger); }
-.btn-success { background: #e3f2ec; color: var(--success); }
+.btn-danger { background: var(--danger-bg); color: var(--danger); }
+.btn-success { background: var(--success-bg); color: var(--success); }
 .btn-danger-ghost { background: none; color: var(--danger); margin-top: 12px; }
 .link-btn { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 0.88rem; }
 
@@ -86,7 +121,7 @@ input, textarea { font-family: inherit; }
 
 /* ============ IMPORT ============ */
 .hint { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
-.hint-warning { background: #fff4e5; color: #8a5a1c; padding: 10px 12px; border-radius: 10px; }
+.hint-warning { background: var(--warning-bg); color: var(--warning-ink); padding: 10px 12px; border-radius: 10px; }
 .upload-box {
   display: flex; align-items: center; justify-content: center;
   border: 2px dashed var(--border); border-radius: var(--radius);
@@ -118,7 +153,7 @@ input, textarea { font-family: inherit; }
   line-height: 1.35;
 }
 .review-row__del {
-  width: 36px; height: 36px; flex-shrink: 0; border: none; background: #fbe9e7; color: var(--danger);
+  width: 36px; height: 36px; flex-shrink: 0; border: none; background: var(--danger-bg); color: var(--danger);
   border-radius: 8px; font-size: 1rem;
 }
 
@@ -153,8 +188,8 @@ input, textarea { font-family: inherit; }
 .choice-btn {
   border: 1px solid var(--border); background: var(--bg); border-radius: 10px; padding: 14px 10px; font-size: 0.95rem; font-weight: 600;
 }
-.choice-btn.correct { background: #e3f2ec; border-color: var(--success); color: var(--success); }
-.choice-btn.wrong { background: #fbe9e7; border-color: var(--danger); color: var(--danger); }
+.choice-btn.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+.choice-btn.wrong { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
 
 .answer-feedback { margin-top: 18px; }
 .answer-feedback p { font-weight: 700; margin-bottom: 12px; }
@@ -174,5 +209,5 @@ input, textarea { font-family: inherit; }
 .result-item__en { flex: 1; font-weight: 600; }
 .result-item__pl { flex: 1; color: var(--muted); text-align: right; }
 .result-item--ok .result-item__icon { color: var(--success); }
-.result-item--bad { border-color: #f3c9c2; background: #fdf4f2; }
+.result-item--bad { border-color: var(--danger-border); background: var(--danger-bg); }
 .result-item--bad .result-item__icon { color: var(--danger); }
