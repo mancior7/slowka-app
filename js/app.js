@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-setup": "Ustawienia nauki",
     "screen-session": "Nauka",
     "screen-results": "Wyniki",
+    "screen-stats": "Statystyki",
   };
   const BACK_TARGET = {
     "screen-import": "screen-home",
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-setup": "screen-home",
     "screen-session": "screen-setup",
     "screen-results": "screen-home",
+    "screen-stats": "screen-home",
   };
 
   let currentScreenId = "screen-home";
@@ -30,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     session: null,
     editingDeckId: null, // ustawione = zapis trafi do istniejącej talii, nie utworzy nowej
     appendMode: false, // true = wynik importu dopisze się do pendingPairs zamiast je zastąpić
+    sessionStartedAt: null,
   };
 
   function showScreen(id) {
@@ -267,6 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
       order: state.selectedOrder,
       rounds: state.selectedRounds,
     });
+    state.sessionStartedAt = Date.now();
     showScreen("screen-session");
     renderQuestion();
   });
@@ -376,6 +380,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderResults() {
     const summary = state.session.getSummary();
     document.getElementById("results-score").textContent = `${summary.correct}/${summary.total}`;
+
+    const deck = VocabStorage.getDeck(state.currentDeckId);
+    VocabStats.recordSession({
+      durationMs: state.sessionStartedAt ? Date.now() - state.sessionStartedAt : 0,
+      wordsAnswered: summary.total,
+      correct: summary.correct,
+      deckName: deck ? deck.name : "",
+    });
+    state.sessionStartedAt = null;
+
     const missedBox = document.getElementById("results-missed");
     missedBox.innerHTML = "";
 
@@ -401,6 +415,39 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-results-done").addEventListener("click", () => {
     renderDeckList();
     showScreen("screen-home");
+  });
+
+  // ===================== STATYSTYKI =====================
+  const DAY_LABELS = ["Nd", "Pn", "Wt", "Śr", "Cz", "Pt", "So"];
+
+  function renderStats() {
+    const summary = VocabStats.getSummary();
+    document.getElementById("stat-total-time").textContent = summary.totalTimeLabel;
+    document.getElementById("stat-total-words").textContent = summary.totalWords;
+    document.getElementById("stat-streak").textContent = summary.streak;
+    document.getElementById("stat-accuracy").textContent = summary.accuracyPct === null ? "—" : summary.accuracyPct + "%";
+    document.getElementById("stats-empty").hidden = summary.hasData;
+
+    const maxMs = Math.max(...summary.last7.map((d) => d.ms), 60000); // co najmniej 1 min skali, żeby słupki nie znikały
+    const week = document.getElementById("stats-week");
+    week.innerHTML = "";
+    summary.last7.forEach((day) => {
+      const dayOfWeek = new Date(day.date).getDay();
+      const pct = Math.round((day.ms / maxMs) * 100);
+      const col = document.createElement("div");
+      col.className = "stats-week__col";
+      col.innerHTML = `
+        <div class="stats-week__bar-track"><div class="stats-week__bar" style="height:${Math.max(pct, day.ms > 0 ? 6 : 0)}%"></div></div>
+        <span class="stats-week__label">${DAY_LABELS[dayOfWeek]}</span>
+      `;
+      col.title = `${VocabStats.formatDuration(day.ms)}`;
+      week.appendChild(col);
+    });
+  }
+
+  document.getElementById("btn-stats").addEventListener("click", () => {
+    renderStats();
+    showScreen("screen-stats");
   });
 
   // ===================== UTIL =====================

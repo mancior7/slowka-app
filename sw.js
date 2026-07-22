@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   "js/imagesplit.js",
   "js/ocr.js",
   "js/quiz.js",
+  "js/stats.js",
   "js/app.js",
   "icons/icon.svg",
 ];
