@@ -178,11 +178,15 @@ const VocabQuiz = (() => {
   // (tak jak pisemny sprawdzian, zamiast pytanie-po-pytaniu).
   function createBulkSession(deckId, words, direction, order = "random") {
     const orderedWords = order === "random" ? shuffle(words) : words.slice();
-    const items = orderedWords.map((word) => ({
-      word,
-      prompt: direction === "en2pl" ? word.en : word.pl,
-      expected: direction === "en2pl" ? word.pl : word.en,
-    }));
+    const items = orderedWords.map((word) => {
+      const wordDirection = direction === "random" ? randomDirection() : direction;
+      return {
+        word,
+        direction: wordDirection,
+        prompt: wordDirection === "en2pl" ? word.en : word.pl,
+        expected: wordDirection === "en2pl" ? word.pl : word.en,
+      };
+    });
 
     function submitAll(answers) {
       return items.map((item, i) => {

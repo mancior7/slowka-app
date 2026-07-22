@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedMode: "typing",
     selectedOrder: "random",
     selectedRounds: 1,
-    selectedDirection: "pl2en",
+    selectedDirection: "random",
     session: null,
     bulkSession: null,
     editingDeckId: null, // ustawione = zapis trafi do istniejącej talii, nie utworzy nowej
@@ -302,20 +302,27 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===================== TEST ZBIORCZY =====================
-  function renderBulkScreen() {
-    const isPl2en = state.selectedDirection === "pl2en";
-    document.getElementById("bulk-instruction").textContent = isPl2en
-      ? "Wpisz angielskie słówka odpowiadające polskim tłumaczeniom."
-      : "Wpisz polskie tłumaczenia angielskich słówek.";
+  const BULK_INSTRUCTIONS = {
+    pl2en: "Wpisz angielskie słówka odpowiadające polskim tłumaczeniom.",
+    en2pl: "Wpisz polskie tłumaczenia angielskich słówek.",
+    random: "Wpisz brakujące tłumaczenie — język pytania zmienia się losowo dla każdego słówka.",
+  };
 
+  function renderBulkScreen() {
+    document.getElementById("bulk-instruction").textContent = BULK_INSTRUCTIONS[state.selectedDirection];
+
+    const isRandom = state.selectedDirection === "random";
     const list = document.getElementById("bulk-list");
     list.innerHTML = "";
     state.bulkSession.items.forEach((item, i) => {
       const row = document.createElement("div");
       row.className = "bulk-row";
+      const dirTag = isRandom
+        ? `<span class="bulk-row__dir">${item.direction === "en2pl" ? "→ PL" : "→ EN"}</span>`
+        : "";
       row.innerHTML = `
         <span class="bulk-row__num">${i + 1}.</span>
-        <span class="bulk-row__prompt">${escapeHtml(item.prompt)}</span>
+        <span class="bulk-row__prompt">${escapeHtml(item.prompt)} ${dirTag}</span>
         <input type="text" class="bulk-row__input" data-i="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" />
       `;
       list.appendChild(row);
