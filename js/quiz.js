@@ -176,8 +176,9 @@ const VocabQuiz = (() => {
   // Test zbiorczy: wszystkie słówka na raz, jeden kierunek dla całej partii,
   // użytkownik wypełnia wszystkie odpowiedzi i sprawdza je jednym kliknięciem
   // (tak jak pisemny sprawdzian, zamiast pytanie-po-pytaniu).
-  function createBulkSession(deckId, words, direction) {
-    const items = words.map((word) => ({
+  function createBulkSession(deckId, words, direction, order = "random") {
+    const orderedWords = order === "random" ? shuffle(words) : words.slice();
+    const items = orderedWords.map((word) => ({
       word,
       prompt: direction === "en2pl" ? word.en : word.pl,
       expected: direction === "en2pl" ? word.pl : word.en,

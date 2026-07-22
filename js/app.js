@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-review": "Sprawdź słówka",
     "screen-setup": "Ustawienia nauki",
     "screen-session": "Nauka",
+    "screen-bulk": "Test zbiorczy",
     "screen-results": "Wyniki",
     "screen-stats": "Statystyki",
   };
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-review": "screen-import",
     "screen-setup": "screen-home",
     "screen-session": "screen-setup",
+    "screen-bulk": "screen-setup",
     "screen-results": "screen-home",
     "screen-stats": "screen-home",
   };
@@ -241,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const isBulk = state.selectedMode === "bulk";
     document.getElementById("direction-group").hidden = !isBulk;
-    document.getElementById("order-group").hidden = isBulk;
     document.getElementById("rounds-group").hidden = isBulk;
   });
 
@@ -283,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const sessionWords = VocabSRS.pickSessionWords(deck.words, deck.words.length);
 
     if (state.selectedMode === "bulk") {
-      state.bulkSession = VocabQuiz.createBulkSession(deck.id, sessionWords, state.selectedDirection);
+      state.bulkSession = VocabQuiz.createBulkSession(deck.id, sessionWords, state.selectedDirection, state.selectedOrder);
       state.sessionStartedAt = Date.now();
       renderBulkScreen();
       showScreen("screen-bulk");
