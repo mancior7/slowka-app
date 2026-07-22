@@ -279,7 +279,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-start-session").addEventListener("click", () => {
     const deck = VocabStorage.getDeck(state.currentDeckId);
     if (!deck || deck.words.length === 0) return;
-    const sessionWords = VocabSRS.pickSessionWords(deck.words, Math.min(20, deck.words.length));
+    // bez sztywnego limitu - jeśli talia ma 86 słówek, sesja obejmuje wszystkie 86
+    const sessionWords = VocabSRS.pickSessionWords(deck.words, deck.words.length);
 
     if (state.selectedMode === "bulk") {
       state.bulkSession = VocabQuiz.createBulkSession(deck.id, sessionWords, state.selectedDirection);
