@@ -82,10 +82,19 @@
         <button class="segmented__opt active" data-mode="typing">Test pisany</button>
         <button class="segmented__opt" data-mode="flashcard">Fiszki</button>
         <button class="segmented__opt" data-mode="choice">Quiz ABCD</button>
+        <button class="segmented__opt" data-mode="bulk">Zbiorczo</button>
       </div>
     </div>
 
-    <div class="option-group">
+    <div class="option-group" id="direction-group" hidden>
+      <span class="option-group__label">Kierunek (test zbiorczy)</span>
+      <div class="segmented" id="direction-picker">
+        <button class="segmented__opt active" data-direction="pl2en">PL → EN</button>
+        <button class="segmented__opt" data-direction="en2pl">EN → PL</button>
+      </div>
+    </div>
+
+    <div class="option-group" id="order-group">
       <span class="option-group__label">Kolejność</span>
       <div class="segmented" id="order-picker">
         <button class="segmented__opt active" data-order="random">Losowo</button>
@@ -93,7 +102,7 @@
       </div>
     </div>
 
-    <div class="option-group">
+    <div class="option-group" id="rounds-group">
       <span class="option-group__label">Liczba powtórzeń partii słówek</span>
       <div class="segmented" id="rounds-picker">
         <button class="segmented__opt active" data-rounds="1">1</button>
@@ -107,6 +116,13 @@
     <button class="btn btn-primary btn-block" id="btn-start-session">Zacznij naukę</button>
     <button class="btn btn-secondary btn-block" id="btn-edit-words">✎ Edytuj nazwę i słówka</button>
     <button class="btn btn-danger-ghost btn-block" id="btn-delete-deck">Usuń talię</button>
+  </section>
+
+  <!-- ===== TEST ZBIORCZY ===== -->
+  <section class="screen" id="screen-bulk">
+    <p class="hint" id="bulk-instruction"></p>
+    <div id="bulk-list" class="bulk-list"></div>
+    <button class="btn btn-primary btn-block" id="btn-bulk-submit">Sprawdź wszystko</button>
   </section>
 
   <!-- ===== SESSION ===== -->

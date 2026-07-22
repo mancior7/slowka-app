@@ -138,6 +138,17 @@ input, textarea { font-family: inherit; }
 .progress-bar { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
 .progress-bar__fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s ease; }
 
+/* ============ TEST ZBIORCZY ============ */
+.bulk-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+.bulk-row { display: flex; align-items: center; gap: 10px; }
+.bulk-row__num { font-size: 0.85rem; color: var(--muted); width: 22px; flex-shrink: 0; text-align: right; }
+.bulk-row__prompt { flex: 1; font-weight: 600; font-size: 0.95rem; }
+.bulk-row__input {
+  flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.92rem;
+  background: var(--surface); color: var(--ink);
+}
+.bulk-row__input:focus { outline: none; border-color: var(--accent); }
+
 /* ============ REVIEW ============ */
 .form-group { margin-bottom: 18px; }
 .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
@@ -202,12 +213,16 @@ input, textarea { font-family: inherit; }
 .results-score__label { color: var(--muted); }
 .missed-title { font-weight: 700; margin: 22px 0 10px; font-size: 0.9rem; color: var(--muted); }
 .result-item {
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px;
   background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; font-size: 0.92rem;
 }
 .result-item__icon { font-weight: 800; width: 18px; text-align: center; flex-shrink: 0; }
 .result-item__en { flex: 1; font-weight: 600; }
 .result-item__pl { flex: 1; color: var(--muted); text-align: right; }
+.result-item__detail {
+  flex-basis: 100%; font-size: 0.82rem; color: var(--danger); padding-left: 30px;
+}
+.result-item__detail strong { color: var(--ink); }
 .result-item--ok .result-item__icon { color: var(--success); }
 .result-item--bad { border-color: var(--danger-border); background: var(--danger-bg); }
 .result-item--bad .result-item__icon { color: var(--danger); }

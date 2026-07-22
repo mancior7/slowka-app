@@ -29,7 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedMode: "typing",
     selectedOrder: "random",
     selectedRounds: 1,
+    selectedDirection: "pl2en",
     session: null,
+    bulkSession: null,
     editingDeckId: null, // ustawione = zapis trafi do istniejącej talii, nie utworzy nowej
     appendMode: false, // true = wynik importu dopisze się do pendingPairs zamiast je zastąpić
     sessionStartedAt: null,
@@ -236,6 +238,19 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("#mode-picker .segmented__opt").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     state.selectedMode = btn.dataset.mode;
+
+    const isBulk = state.selectedMode === "bulk";
+    document.getElementById("direction-group").hidden = !isBulk;
+    document.getElementById("order-group").hidden = isBulk;
+    document.getElementById("rounds-group").hidden = isBulk;
+  });
+
+  document.getElementById("direction-picker").addEventListener("click", (e) => {
+    const btn = e.target.closest(".segmented__opt");
+    if (!btn) return;
+    document.querySelectorAll("#direction-picker .segmented__opt").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.selectedDirection = btn.dataset.direction;
   });
 
   document.getElementById("order-picker").addEventListener("click", (e) => {
@@ -265,6 +280,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const deck = VocabStorage.getDeck(state.currentDeckId);
     if (!deck || deck.words.length === 0) return;
     const sessionWords = VocabSRS.pickSessionWords(deck.words, Math.min(20, deck.words.length));
+
+    if (state.selectedMode === "bulk") {
+      state.bulkSession = VocabQuiz.createBulkSession(deck.id, sessionWords, state.selectedDirection);
+      state.sessionStartedAt = Date.now();
+      renderBulkScreen();
+      showScreen("screen-bulk");
+      return;
+    }
+
     state.session = VocabQuiz.createSession(deck.id, sessionWords, deck.words, {
       mode: state.selectedMode,
       order: state.selectedOrder,
@@ -274,6 +298,72 @@ document.addEventListener("DOMContentLoaded", () => {
     showScreen("screen-session");
     renderQuestion();
   });
+
+  // ===================== TEST ZBIORCZY =====================
+  function renderBulkScreen() {
+    const isPl2en = state.selectedDirection === "pl2en";
+    document.getElementById("bulk-instruction").textContent = isPl2en
+      ? "Wpisz angielskie słówka odpowiadające polskim tłumaczeniom."
+      : "Wpisz polskie tłumaczenia angielskich słówek.";
+
+    const list = document.getElementById("bulk-list");
+    list.innerHTML = "";
+    state.bulkSession.items.forEach((item, i) => {
+      const row = document.createElement("div");
+      row.className = "bulk-row";
+      row.innerHTML = `
+        <span class="bulk-row__num">${i + 1}.</span>
+        <span class="bulk-row__prompt">${escapeHtml(item.prompt)}</span>
+        <input type="text" class="bulk-row__input" data-i="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" />
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById("btn-bulk-submit").addEventListener("click", () => {
+    const inputs = document.querySelectorAll(".bulk-row__input");
+    const answers = Array.from(inputs).map((input) => input.value);
+    const results = state.bulkSession.submitAll(answers);
+    renderBulkResults(results);
+    showScreen("screen-results");
+  });
+
+  function renderBulkResults(results) {
+    const correct = results.filter((r) => r.correct).length;
+    document.getElementById("results-score").textContent = `${correct}/${results.length}`;
+
+    const deck = VocabStorage.getDeck(state.currentDeckId);
+    VocabStats.recordSession({
+      durationMs: state.sessionStartedAt ? Date.now() - state.sessionStartedAt : 0,
+      wordsAnswered: results.length,
+      correct,
+      deckName: deck ? deck.name : "",
+    });
+    state.sessionStartedAt = null;
+
+    const box = document.getElementById("results-missed");
+    box.innerHTML = "";
+    const title = document.createElement("p");
+    title.className = "missed-title";
+    title.textContent = "Wszystkie słówka z testu:";
+    box.appendChild(title);
+
+    const sorted = [...results].sort((a, b) => Number(a.correct) - Number(b.correct));
+    sorted.forEach((r) => {
+      const row = document.createElement("div");
+      row.className = "result-item " + (r.correct ? "result-item--ok" : "result-item--bad");
+      const detail = r.correct
+        ? ""
+        : `<span class="result-item__detail">Napisałeś: <strong>${escapeHtml(r.userAnswer || "—")}</strong></span>`;
+      row.innerHTML = `
+        <span class="result-item__icon">${r.correct ? "✓" : "✗"}</span>
+        <span class="result-item__en">${escapeHtml(r.prompt)}</span>
+        <span class="result-item__pl">${escapeHtml(r.expected)}</span>
+        ${detail}
+      `;
+      box.appendChild(row);
+    });
+  }
 
   // ===================== SESSION =====================
   const modePanels = {

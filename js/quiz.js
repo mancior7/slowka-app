@@ -173,5 +173,29 @@ const VocabQuiz = (() => {
     };
   }
 
-  return { checkAnswer, normalize, createSession };
+  // Test zbiorczy: wszystkie słówka na raz, jeden kierunek dla całej partii,
+  // użytkownik wypełnia wszystkie odpowiedzi i sprawdza je jednym kliknięciem
+  // (tak jak pisemny sprawdzian, zamiast pytanie-po-pytaniu).
+  function createBulkSession(deckId, words, direction) {
+    const items = words.map((word) => ({
+      word,
+      prompt: direction === "en2pl" ? word.en : word.pl,
+      expected: direction === "en2pl" ? word.pl : word.en,
+    }));
+
+    function submitAll(answers) {
+      return items.map((item, i) => {
+        const userAnswer = (answers[i] || "").trim();
+        const { correct, quality } = checkAnswer(userAnswer, item.expected);
+        const updates = VocabSRS.review(item.word, quality);
+        Object.assign(item.word, updates);
+        VocabStorage.updateWord(deckId, item.word.id, updates);
+        return { en: item.word.en, pl: item.word.pl, prompt: item.prompt, expected: item.expected, userAnswer, correct };
+      });
+    }
+
+    return { items, submitAll };
+  }
+
+  return { checkAnswer, normalize, createSession, createBulkSession };
 })();

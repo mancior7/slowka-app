@@ -15,8 +15,20 @@ const STATIC_ASSETS = [
   "icons/icon.svg",
 ];
 
+// Wymusza pominięcie zwykłego cache'u HTTP przeglądarki (nie tylko Cache Storage) -
+// bez tego zwykły fetch() potrafi dostać stary plik z dysku, mimo że logika poniżej
+// próbuje zawsze najpierw iść do sieci.
+function freshFetch(requestOrUrl) {
+  const req = requestOrUrl instanceof Request ? requestOrUrl : new Request(requestOrUrl);
+  return fetch(new Request(req, { cache: "no-store" }));
+}
+
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)));
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => Promise.all(STATIC_ASSETS.map((url) => freshFetch(url).then((res) => cache.put(url, res)))))
+  );
   self.skipWaiting();
 });
 
@@ -35,7 +47,7 @@ self.addEventListener("fetch", (event) => {
   // zapasowa opcja offline. Wersja odwrotna (cache-first) potrafi latami serwować
   // stare pliki po aktualizacji kodu.
   event.respondWith(
-    fetch(event.request)
+    freshFetch(event.request)
       .then((response) => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
