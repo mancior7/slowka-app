@@ -152,8 +152,10 @@
 
     <div class="question-card">
       <p class="question-direction" id="question-direction"></p>
-      <p class="question-word" id="question-word"></p>
-      <button class="speak-btn" id="btn-speak-question" type="button" aria-label="Odsłuchaj wymowę" hidden>🔊</button>
+      <div class="question-word-row">
+        <p class="question-word" id="question-word"></p>
+        <button class="speak-btn" id="btn-speak-question" type="button" aria-label="Odsłuchaj wymowę" hidden>🔊</button>
+      </div>
 
       <div id="mode-typing" class="mode-panel">
         <input type="text" id="typing-input" class="typing-input" placeholder="Wpisz odpowiedź" autocomplete="off" autocapitalize="off" spellcheck="false" />
@@ -174,8 +176,10 @@
       </div>
 
       <div id="answer-feedback" class="answer-feedback" hidden>
-        <p id="feedback-text"></p>
-        <button class="speak-btn" id="btn-speak-feedback" type="button" aria-label="Odsłuchaj wymowę">🔊</button>
+        <div class="feedback-row">
+          <p id="feedback-text"></p>
+          <button class="speak-btn" id="btn-speak-feedback" type="button" aria-label="Odsłuchaj wymowę">🔊</button>
+        </div>
         <button class="btn btn-primary btn-block" id="btn-next-question">Dalej</button>
       </div>
     </div>

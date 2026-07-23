@@ -246,13 +246,18 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   border: 1px solid var(--border); text-align: center;
 }
 .question-direction { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
-.question-word { font-size: 1.9rem; font-weight: 700; margin-bottom: 24px; }
+.question-word-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 24px; }
+.question-word { font-size: 1.9rem; font-weight: 700; }
 .speak-btn {
-  border: none; background: none; font-size: 1.2rem; padding: 4px 8px; line-height: 1;
-  color: var(--accent); transition: transform 0.12s ease, opacity 0.15s ease;
+  width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%;
+  border: none; background: var(--bg); font-size: 1.4rem; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--accent); transition: transform 0.12s ease, background-color 0.15s ease;
 }
-.speak-btn:active { transform: scale(0.85); }
-.result-item .speak-btn { font-size: 1rem; padding: 0 4px; flex-shrink: 0; }
+.speak-btn:active { background: var(--border); transform: scale(0.88); }
+.feedback-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
+.answer-feedback .feedback-row p { margin-bottom: 0; }
+.result-item .speak-btn { width: 32px; height: 32px; font-size: 1.05rem; }
 .typing-input {
   width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px;
   font-size: 1.1rem; text-align: center; margin-bottom: 14px;
