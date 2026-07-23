@@ -187,14 +187,6 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px;
   font-size: 0.95rem; margin-bottom: 12px; resize: vertical; background: var(--surface);
 }
-.ocr-key-box { margin-top: 4px; }
-.ocr-key-form { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
-.ocr-key-form .hint { margin-bottom: 0; }
-.ocr-key-form__actions { display: flex; gap: 8px; }
-.ocr-key-form__actions .btn { flex: 1; margin-top: 0; }
-.ocr-key-status { font-size: 0.82rem; color: var(--accent); font-weight: 600; }
-.ocr-key-status.error { color: var(--danger); }
-
 .ocr-progress { margin-bottom: 16px; text-align: center; }
 .ocr-progress p { font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
 .progress-bar { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
@@ -255,6 +247,12 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
 }
 .question-direction { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
 .question-word { font-size: 1.9rem; font-weight: 700; margin-bottom: 24px; }
+.speak-btn {
+  border: none; background: none; font-size: 1.2rem; padding: 4px 8px; line-height: 1;
+  color: var(--accent); transition: transform 0.12s ease, opacity 0.15s ease;
+}
+.speak-btn:active { transform: scale(0.85); }
+.result-item .speak-btn { font-size: 1rem; padding: 0 4px; flex-shrink: 0; }
 .typing-input {
   width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px;
   font-size: 1.1rem; text-align: center; margin-bottom: 14px;

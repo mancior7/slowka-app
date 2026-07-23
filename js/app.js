@@ -104,33 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showScreen("screen-import");
   });
 
-  // ===================== IMPORT: klucz Google Cloud Vision (opcjonalny) =====================
-  const ocrKeyForm = document.getElementById("ocr-key-form");
-  const inputVisionKey = document.getElementById("input-vision-key");
-  const ocrKeyStatus = document.getElementById("ocr-key-status");
-
-  function refreshOcrKeyStatus() {
-    const key = VocabOCR.getVisionApiKey();
-    ocrKeyStatus.classList.remove("error");
-    ocrKeyStatus.textContent = key ? "✓ Zapisano — OCR używa teraz Google Cloud Vision." : "Brak klucza — OCR używa Tesseract.js.";
-    inputVisionKey.value = key;
-  }
-
-  document.getElementById("btn-toggle-key-form").addEventListener("click", () => {
-    ocrKeyForm.hidden = !ocrKeyForm.hidden;
-    if (!ocrKeyForm.hidden) refreshOcrKeyStatus();
-  });
-
-  document.getElementById("btn-save-vision-key").addEventListener("click", () => {
-    VocabOCR.saveVisionApiKey(inputVisionKey.value);
-    refreshOcrKeyStatus();
-  });
-
-  document.getElementById("btn-clear-vision-key").addEventListener("click", () => {
-    VocabOCR.saveVisionApiKey("");
-    refreshOcrKeyStatus();
-  });
-
   // ===================== IMPORT =====================
   const inputPhoto = document.getElementById("input-photo");
 
@@ -441,6 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="result-item__icon">${r.correct ? "✓" : "✗"}</span>
         <span class="result-item__en">${escapeHtml(r.prompt)}</span>
         <span class="result-item__pl">${escapeHtml(r.expected)}</span>
+        <button class="speak-btn" data-speak-text="${escapeAttr(r.en)}" type="button" aria-label="Odsłuchaj wymowę">🔊</button>
         ${detail}
       `;
       box.appendChild(row);
@@ -466,6 +440,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("question-direction").textContent = q.direction === "en2pl" ? "Angielski → Polski" : "Polski → Angielski";
     document.getElementById("question-word").textContent = q.prompt;
+    // głośniczek przy pytaniu ma sens tylko gdy widoczne słowo jest akurat angielskie -
+    // inaczej zdradzałby odpowiedź zanim użytkownik spróbuje
+    document.getElementById("btn-speak-question").hidden = q.direction !== "en2pl";
 
     const { index, total, round, totalRounds } = session.progress();
     document.getElementById("session-progress-fill").style.width = Math.round((index / total) * 100) + "%";
@@ -539,6 +516,14 @@ document.addEventListener("DOMContentLoaded", () => {
     showFeedback(correct, expected);
   }
 
+  document.getElementById("btn-speak-question").addEventListener("click", () => {
+    VocabSpeech.speak(state.session.current().word.en);
+  });
+
+  document.getElementById("btn-speak-feedback").addEventListener("click", () => {
+    VocabSpeech.speak(state.session.current().word.en);
+  });
+
   document.getElementById("btn-next-question").addEventListener("click", () => {
     state.session.advance();
     if (state.session.hasNext()) {
@@ -581,10 +566,16 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="result-item__icon">${r.correct ? "✓" : "✗"}</span>
         <span class="result-item__en">${escapeHtml(r.en)}</span>
         <span class="result-item__pl">${escapeHtml(r.pl)}</span>
+        <button class="speak-btn" data-speak-text="${escapeAttr(r.en)}" type="button" aria-label="Odsłuchaj wymowę">🔊</button>
       `;
       missedBox.appendChild(row);
     });
   }
+
+  document.getElementById("results-missed").addEventListener("click", (e) => {
+    const btn = e.target.closest(".speak-btn");
+    if (btn) VocabSpeech.speak(btn.dataset.speakText);
+  });
 
   document.getElementById("btn-results-done").addEventListener("click", () => {
     renderDeckList();
