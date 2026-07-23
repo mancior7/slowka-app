@@ -104,6 +104,33 @@ document.addEventListener("DOMContentLoaded", () => {
     showScreen("screen-import");
   });
 
+  // ===================== IMPORT: klucz Google Cloud Vision (opcjonalny) =====================
+  const ocrKeyForm = document.getElementById("ocr-key-form");
+  const inputVisionKey = document.getElementById("input-vision-key");
+  const ocrKeyStatus = document.getElementById("ocr-key-status");
+
+  function refreshOcrKeyStatus() {
+    const key = VocabOCR.getVisionApiKey();
+    ocrKeyStatus.classList.remove("error");
+    ocrKeyStatus.textContent = key ? "✓ Zapisano — OCR używa teraz Google Cloud Vision." : "Brak klucza — OCR używa Tesseract.js.";
+    inputVisionKey.value = key;
+  }
+
+  document.getElementById("btn-toggle-key-form").addEventListener("click", () => {
+    ocrKeyForm.hidden = !ocrKeyForm.hidden;
+    if (!ocrKeyForm.hidden) refreshOcrKeyStatus();
+  });
+
+  document.getElementById("btn-save-vision-key").addEventListener("click", () => {
+    VocabOCR.saveVisionApiKey(inputVisionKey.value);
+    refreshOcrKeyStatus();
+  });
+
+  document.getElementById("btn-clear-vision-key").addEventListener("click", () => {
+    VocabOCR.saveVisionApiKey("");
+    refreshOcrKeyStatus();
+  });
+
   // ===================== IMPORT =====================
   const inputPhoto = document.getElementById("input-photo");
 
@@ -119,9 +146,9 @@ document.addEventListener("DOMContentLoaded", () => {
     progressText.textContent = "Rozpoznawanie tekstu...";
 
     try {
-      const text = await VocabOCR.recognize(file, (pct) => {
+      const text = await VocabOCR.recognize(file, (pct, label) => {
         progressFill.style.width = pct + "%";
-        progressText.textContent = `Rozpoznawanie tekstu... ${pct}%`;
+        progressText.textContent = `${label || "Rozpoznawanie tekstu..."} ${pct}%`;
       });
       progressWrap.hidden = true;
       const pairs = VocabParser.parse(text);

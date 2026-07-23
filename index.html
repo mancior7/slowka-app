@@ -56,6 +56,19 @@
 
     <textarea id="input-paste" class="paste-area" rows="6" placeholder="apple - jabłko&#10;dog - pies&#10;run - biegać"></textarea>
     <button class="btn btn-secondary btn-block" id="btn-parse-paste">Wczytaj wklejony tekst</button>
+
+    <div class="ocr-key-box">
+      <button class="link-btn" id="btn-toggle-key-form" type="button">⚙ Zaawansowane: klucz Google Cloud Vision (lepszy OCR)</button>
+      <div class="ocr-key-form" id="ocr-key-form" hidden>
+        <p class="hint">Wklej własny klucz API Google Cloud Vision — zostanie zapisany tylko w tej przeglądarce (localStorage), nigdy w kodzie apki. Bez klucza działa jak dotychczas przez Tesseract.js.</p>
+        <input type="password" id="input-vision-key" class="paste-area" placeholder="Klucz API (AIza...)" autocomplete="off" />
+        <div class="ocr-key-form__actions">
+          <button class="btn btn-secondary" id="btn-save-vision-key" type="button">Zapisz klucz</button>
+          <button class="btn btn-danger-ghost" id="btn-clear-vision-key" type="button">Usuń klucz</button>
+        </div>
+        <p class="ocr-key-status" id="ocr-key-status"></p>
+      </div>
+    </div>
   </section>
 
   <!-- ===== REVIEW: popraw wykryte pary ===== -->
