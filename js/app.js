@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedOrder: "random",
     selectedRounds: 1,
     selectedDirection: "random",
+    selectedBulkCount: 10,
     session: null,
     bulkSession: null,
     editingDeckId: null, // ustawione = zapis trafi do istniejącej talii, nie utworzy nowej
@@ -39,9 +40,24 @@ document.addEventListener("DOMContentLoaded", () => {
     sessionStartedAt: null,
   };
 
+  let screenLeaveTimeout = null;
   function showScreen(id) {
-    Object.values(screens).forEach((el) => el.classList.remove("active"));
-    screens[id].classList.add("active");
+    const next = screens[id];
+    const prev = screens[currentScreenId];
+    if (screenLeaveTimeout) {
+      clearTimeout(screenLeaveTimeout);
+      screenLeaveTimeout = null;
+      Object.values(screens).forEach((el) => el.classList.remove("leaving"));
+    }
+    if (prev && prev !== next) {
+      prev.classList.remove("active");
+      prev.classList.add("leaving");
+      screenLeaveTimeout = setTimeout(() => {
+        prev.classList.remove("leaving");
+        screenLeaveTimeout = null;
+      }, 200);
+    }
+    next.classList.add("active");
     currentScreenId = id;
     topbarTitle.textContent = TITLES[id] || "WordSnap";
     btnBack.hidden = !BACK_TARGET[id];
@@ -64,7 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
     decks.forEach((deck) => {
       const dueCount = deck.words.filter((w) => VocabSRS.isDue(w)).length;
       const card = document.createElement("div");
-      card.className = "deck-card";
+      card.className = "deck-card stagger-item";
+      card.style.setProperty("--i", Math.min(list.children.length, 10));
       card.innerHTML = `
         <div class="deck-card__info">
           <h3>${escapeHtml(deck.name)}</h3>
@@ -150,7 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = "";
     state.pendingPairs.forEach((pair, i) => {
       const row = document.createElement("div");
-      row.className = "review-row";
+      row.className = "review-row stagger-item";
+      row.style.setProperty("--i", Math.min(i, 10));
       row.innerHTML = `
         <textarea rows="1" placeholder="EN" data-field="en" data-i="${i}">${escapeHtml(pair.en)}</textarea>
         <textarea rows="1" placeholder="PL" data-field="pl" data-i="${i}">${escapeHtml(pair.pl)}</textarea>
@@ -243,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const isBulk = state.selectedMode === "bulk";
     document.getElementById("direction-group").hidden = !isBulk;
+    document.getElementById("bulk-count-group").hidden = !isBulk;
     document.getElementById("rounds-group").hidden = isBulk;
   });
 
@@ -252,6 +271,29 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("#direction-picker .segmented__opt").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     state.selectedDirection = btn.dataset.direction;
+  });
+
+  const bulkCountCustom = document.getElementById("bulk-count-custom");
+
+  document.getElementById("bulk-count-picker").addEventListener("click", (e) => {
+    const btn = e.target.closest(".segmented__opt");
+    if (!btn) return;
+    document.querySelectorAll("#bulk-count-picker .segmented__opt").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    state.selectedBulkCount = +btn.dataset.count;
+    bulkCountCustom.value = "";
+  });
+
+  bulkCountCustom.addEventListener("input", () => {
+    const val = parseInt(bulkCountCustom.value, 10);
+    if (val > 0) {
+      document.querySelectorAll("#bulk-count-picker .segmented__opt").forEach((b) => b.classList.remove("active"));
+      state.selectedBulkCount = val;
+    } else if (!bulkCountCustom.value) {
+      const defaultBtn = document.querySelector('#bulk-count-picker .segmented__opt[data-count="10"]');
+      defaultBtn.classList.add("active");
+      state.selectedBulkCount = 10;
+    }
   });
 
   document.getElementById("order-picker").addEventListener("click", (e) => {
@@ -280,17 +322,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-start-session").addEventListener("click", () => {
     const deck = VocabStorage.getDeck(state.currentDeckId);
     if (!deck || deck.words.length === 0) return;
-    // bez sztywnego limitu - jeśli talia ma 86 słówek, sesja obejmuje wszystkie 86
-    const sessionWords = VocabSRS.pickSessionWords(deck.words, deck.words.length);
 
     if (state.selectedMode === "bulk") {
-      state.bulkSession = VocabQuiz.createBulkSession(deck.id, sessionWords, state.selectedDirection, state.selectedOrder);
+      const bulkCount = Math.min(Math.max(1, state.selectedBulkCount || 10), deck.words.length);
+      const bulkWords = VocabSRS.pickSessionWords(deck.words, bulkCount);
+      state.bulkSession = VocabQuiz.createBulkSession(deck.id, bulkWords, state.selectedDirection, state.selectedOrder);
       state.sessionStartedAt = Date.now();
       renderBulkScreen();
       showScreen("screen-bulk");
       return;
     }
 
+    // bez sztywnego limitu - jeśli talia ma 86 słówek, sesja obejmuje wszystkie 86
+    const sessionWords = VocabSRS.pickSessionWords(deck.words, deck.words.length);
     state.session = VocabQuiz.createSession(deck.id, sessionWords, deck.words, {
       mode: state.selectedMode,
       order: state.selectedOrder,
@@ -316,7 +360,8 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = "";
     state.bulkSession.items.forEach((item, i) => {
       const row = document.createElement("div");
-      row.className = "bulk-row";
+      row.className = "bulk-row stagger-item";
+      row.style.setProperty("--i", Math.min(i, 10));
       const dirTag = isRandom
         ? `<span class="bulk-row__dir">${item.direction === "en2pl" ? "→ PL" : "→ EN"}</span>`
         : "";
@@ -358,9 +403,10 @@ document.addEventListener("DOMContentLoaded", () => {
     box.appendChild(title);
 
     const sorted = [...results].sort((a, b) => Number(a.correct) - Number(b.correct));
-    sorted.forEach((r) => {
+    sorted.forEach((r, i) => {
       const row = document.createElement("div");
-      row.className = "result-item " + (r.correct ? "result-item--ok" : "result-item--bad");
+      row.className = "result-item stagger-item " + (r.correct ? "result-item--ok" : "result-item--bad");
+      row.style.setProperty("--i", Math.min(i, 10));
       const detail = r.correct
         ? ""
         : `<span class="result-item__detail">Napisałeś: <strong>${escapeHtml(r.userAnswer || "—")}</strong></span>`;
@@ -412,9 +458,10 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (session.mode === "choice") {
       const list = document.getElementById("choices-list");
       list.innerHTML = "";
-      q.choices.forEach((choice) => {
+      q.choices.forEach((choice, i) => {
         const btn = document.createElement("button");
-        btn.className = "choice-btn";
+        btn.className = "choice-btn stagger-item";
+        btn.style.setProperty("--i", Math.min(i, 10));
         btn.textContent = choice;
         btn.addEventListener("click", () => handleChoiceAnswer(btn, choice));
         list.appendChild(btn);
@@ -499,9 +546,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // błędne odpowiedzi na górze, żeby od razu było widać co powtórzyć
     const sorted = [...summary.all].sort((a, b) => Number(a.correct) - Number(b.correct));
-    sorted.forEach((r) => {
+    sorted.forEach((r, i) => {
       const row = document.createElement("div");
-      row.className = "result-item " + (r.correct ? "result-item--ok" : "result-item--bad");
+      row.className = "result-item stagger-item " + (r.correct ? "result-item--ok" : "result-item--bad");
+      row.style.setProperty("--i", Math.min(i, 10));
       row.innerHTML = `
         <span class="result-item__icon">${r.correct ? "✓" : "✗"}</span>
         <span class="result-item__en">${escapeHtml(r.en)}</span>

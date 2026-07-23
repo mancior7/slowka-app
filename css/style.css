@@ -50,6 +50,14 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 [hidden] { display: none !important; }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -61,7 +69,18 @@ body {
 }
 
 button { font-family: inherit; cursor: pointer; }
-input, textarea { font-family: inherit; }
+input, textarea { font-family: inherit; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-item {
+  opacity: 0;
+  animation: item-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
 
 /* ============ EKRAN POWITALNY ============ */
 .splash-screen {
@@ -92,10 +111,6 @@ input, textarea { font-family: inherit; }
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .splash-screen__icon, .splash-screen__title, .splash-screen__brand { animation: none; }
-}
-
 .topbar {
   position: sticky; top: 0; z-index: 50;
   display: flex; align-items: center; gap: 12px;
@@ -110,7 +125,9 @@ input, textarea { font-family: inherit; }
   width: 36px; height: 36px; border-radius: 50%;
   border: none; background: var(--bg); font-size: 1.1rem;
   display: flex; align-items: center; justify-content: center;
+  transition: background-color 0.15s ease, transform 0.12s ease;
 }
+.icon-btn:active { transform: scale(0.88); }
 
 #app {
   max-width: 480px;
@@ -118,9 +135,11 @@ input, textarea { font-family: inherit; }
   padding: 20px;
 }
 
-.screen { display: none; animation: fadein 0.25s ease; }
-.screen.active { display: block; }
-@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.screen { display: none; }
+.screen.active { display: block; animation: screen-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.screen.leaving { display: block; animation: screen-out 0.18s ease forwards; }
+@keyframes screen-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes screen-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-6px); } }
 
 /* ============ BUTTONS ============ */
 .btn {
@@ -142,7 +161,9 @@ input, textarea { font-family: inherit; }
 .deck-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+.deck-card:active { transform: scale(0.98); }
 .deck-card__info h3 { font-size: 1rem; margin-bottom: 4px; }
 .deck-card__info p { font-size: 0.82rem; color: var(--muted); }
 .deck-card__due {
@@ -209,8 +230,13 @@ input, textarea { font-family: inherit; }
 .segmented { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; }
 .segmented__opt {
   flex: 1; border: none; background: none; padding: 10px 8px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--muted);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .segmented__opt.active { background: var(--accent); color: #fff; }
+.bulk-count-custom {
+  width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+  font-size: 0.92rem; background: var(--surface); color: var(--ink);
+}
 
 /* ============ SESSION ============ */
 .session-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
@@ -226,24 +252,33 @@ input, textarea { font-family: inherit; }
   font-size: 1.1rem; text-align: center; margin-bottom: 14px;
 }
 .typing-input:focus { outline: none; border-color: var(--accent); }
-.reveal-answer { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin: 16px 0; }
+.reveal-answer { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin: 16px 0; animation: item-in 0.3s ease; }
 .flash-actions { display: flex; gap: 10px; margin-top: 6px; }
 .flash-actions .btn { flex: 1; }
 .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .choice-btn {
   border: 1px solid var(--border); background: var(--bg); border-radius: 10px; padding: 14px 10px; font-size: 0.95rem; font-weight: 600;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.12s ease;
 }
+.choice-btn:active:not(:disabled) { transform: scale(0.96); }
+.choice-btn:disabled { opacity: 0.55; }
+.choice-btn.correct, .choice-btn.wrong { opacity: 1; }
 .choice-btn.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
 .choice-btn.wrong { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
 
-.answer-feedback { margin-top: 18px; }
+.answer-feedback { margin-top: 18px; animation: item-in 0.3s ease; }
 .answer-feedback p { font-weight: 700; margin-bottom: 12px; }
 .answer-feedback.correct p { color: var(--success); }
 .answer-feedback.wrong p { color: var(--danger); }
 
 /* ============ RESULTS ============ */
 .results-score { text-align: center; margin: 30px 0; }
-.results-score__num { font-size: 3rem; font-weight: 800; color: var(--accent); }
+.results-score__num { font-size: 3rem; font-weight: 800; color: var(--accent); animation: score-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes score-pop {
+  from { opacity: 0; transform: scale(0.5); }
+  60% { transform: scale(1.08); }
+  to { opacity: 1; transform: scale(1); }
+}
 .results-score__label { color: var(--muted); }
 .missed-title { font-weight: 700; margin: 22px 0 10px; font-size: 0.9rem; color: var(--muted); }
 .result-item {

@@ -101,6 +101,17 @@
       </div>
     </div>
 
+    <div class="option-group" id="bulk-count-group" hidden>
+      <span class="option-group__label">Liczba słówek (test zbiorczy)</span>
+      <div class="segmented" id="bulk-count-picker">
+        <button class="segmented__opt active" data-count="10">10</button>
+        <button class="segmented__opt" data-count="20">20</button>
+        <button class="segmented__opt" data-count="30">30</button>
+        <button class="segmented__opt" data-count="40">40</button>
+      </div>
+      <input type="number" id="bulk-count-custom" class="bulk-count-custom" placeholder="albo wpisz własną liczbę" min="1" inputmode="numeric" />
+    </div>
+
     <div class="option-group" id="order-group">
       <span class="option-group__label">Kolejność</span>
       <div class="segmented" id="order-picker">
