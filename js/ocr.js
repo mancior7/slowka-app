@@ -77,14 +77,16 @@ const VocabOCR = (() => {
   }
 
   async function recognize(imageFile, onProgress) {
-    // Jeśli wykryjemy dwie kolumny tekstu, dzielimy zdjęcie i czytamy je osobno -
-    // inaczej OCR miesza tekst z lewej i prawej kolumny w złej kolejności.
-    const parts = await VocabImageSplit.splitIfTwoColumn(imageFile);
     const apiKey = getVisionApiKey();
 
     if (apiKey) {
       try {
-        return await recognizeWithVision(parts, apiKey, onProgress);
+        // Vision ma własną, dużo lepszą analizę układu strony (kolumny, akapity,
+        // wielolinijkowe wpisy) niż nasze proste wykrywanie "szczeliny" w
+        // imagesplit.js - ręczne cięcie obrazu tylko by jej przeszkadzało,
+        // zwłaszcza przy układach typu "słowo / transkrypcja / tłumaczenie"
+        // w jednym wierszu, gdzie nie ma naprawdę dwóch niezależnych kolumn.
+        return await recognizeWithVision([imageFile], apiKey, onProgress);
       } catch (err) {
         // klucz zły/wyczerpany limit itp. - nie blokujemy importu, wracamy do
         // Tesseract.js, ale widocznie informujemy o tym w pasku postępu
@@ -92,6 +94,9 @@ const VocabOCR = (() => {
       }
     }
 
+    // Tesseract radzi sobie z układem wielokolumnowym dużo słabiej, więc tu
+    // nadal dzielimy zdjęcie na kolumny przed OCR, jeśli je wykryjemy.
+    const parts = await VocabImageSplit.splitIfTwoColumn(imageFile);
     return recognizeWithTesseract(parts, onProgress);
   }
 
