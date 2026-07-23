@@ -441,8 +441,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("question-direction").textContent = q.direction === "en2pl" ? "Angielski → Polski" : "Polski → Angielski";
     document.getElementById("question-word").textContent = q.prompt;
     // głośniczek przy pytaniu ma sens tylko gdy widoczne słowo jest akurat angielskie -
-    // inaczej zdradzałby odpowiedź zanim użytkownik spróbuje
-    document.getElementById("btn-speak-question").hidden = q.direction !== "en2pl";
+    // inaczej zdradzałby odpowiedź zanim użytkownik spróbuje. Ten w feedbacku pokazuje
+    // się tylko gdy tamten był ukryty, żeby nigdy nie było dwóch naraz.
+    const showsEnglishAlready = q.direction === "en2pl";
+    document.getElementById("btn-speak-question").hidden = !showsEnglishAlready;
+    document.getElementById("btn-speak-feedback").hidden = showsEnglishAlready;
 
     const { index, total, round, totalRounds } = session.progress();
     document.getElementById("session-progress-fill").style.width = Math.round((index / total) * 100) + "%";
