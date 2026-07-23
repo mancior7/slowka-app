@@ -589,4 +589,14 @@ document.addEventListener("DOMContentLoaded", () => {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   }
+
+  const splashScreen = document.getElementById("splash-screen");
+  if (splashScreen) {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const showMs = prefersReducedMotion ? 500 : 1500;
+    setTimeout(() => {
+      splashScreen.classList.add("splash-screen--hidden");
+      setTimeout(() => splashScreen.remove(), 550);
+    }, showMs);
+  }
 });
