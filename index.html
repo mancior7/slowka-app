@@ -22,6 +22,7 @@
   <button class="icon-btn" id="btn-back" hidden aria-label="Wstecz">←</button>
   <h1 id="topbar-title">WordSnap</h1>
   <span class="topbar-spacer"></span>
+  <button class="icon-btn" id="btn-help" aria-label="Jak korzystać z aplikacji">❓</button>
   <button class="icon-btn" id="btn-stats" aria-label="Statystyki nauki">📊</button>
   <button class="icon-btn" id="btn-theme-toggle" aria-label="Zmień motyw (jasny/ciemny)">🌙</button>
 </header>
@@ -40,7 +41,7 @@
   <!-- ===== IMPORT: zdjęcie / wklejony tekst ===== -->
   <section class="screen" id="screen-import">
     <p class="hint">Zrób zdjęcie listy słówek (para w linii: „słówko - tłumaczenie”) albo wklej tekst ręcznie.</p>
-    <p class="hint hint-warning">⚠️ Strona sama próbuje wykryć i rozdzielić dwie kolumny tekstu. Jeśli wynik nadal wygląda źle, spróbuj zrobić osobne zdjęcie każdej kolumny.</p>
+    <p class="hint hint-warning">⚠️ Rozpoznawanie tekstu ze zdjęcia nie zawsze jest idealne — czasem coś trzeba będzie poprawić ręcznie, to normalne. Na następnym ekranie zawsze przejrzyj wykryte pary przed zapisaniem talii. Jeśli wynik wygląda źle, spróbuj zrobić osobne, wyraźne zdjęcie każdej kolumny tekstu.</p>
 
     <label class="upload-box" id="upload-box">
       <input type="file" accept="image/*" id="input-photo" hidden />
@@ -222,6 +223,34 @@
     <p class="hint" id="stats-empty" hidden>
       Jeszcze nie masz żadnej ukończonej sesji nauki — statystyki pojawią się po pierwszej.
     </p>
+  </section>
+
+  <!-- ===== POMOC / JAK KORZYSTAĆ ===== -->
+  <section class="screen" id="screen-help">
+    <div class="help-section">
+      <h3 class="help-section__title">📷 Dodawanie słówek</h3>
+      <p class="hint">Zrób zdjęcie listy słówek (np. z podręcznika albo zeszytu) albo wklej tekst ręcznie w formacie „słówko - tłumaczenie”. Rozpoznawanie tekstu ze zdjęcia bywa niedoskonałe — zawsze przejrzyj wykryte pary przed zapisaniem i popraw, co trzeba. Talię możesz też później dowolnie edytować.</p>
+    </div>
+
+    <div class="help-section">
+      <h3 class="help-section__title">🧠 Tryby nauki</h3>
+      <p class="hint"><strong>Test pisany</strong> — wpisujesz odpowiedź z klawiatury. <strong>Fiszki</strong> — sam oceniasz, czy znałeś słówko. <strong>Quiz ABCD</strong> — wybierasz jedną z 4 opcji. <strong>Zbiorczo</strong> — wypełniasz wszystkie odpowiedzi naraz, jak na sprawdzianie, z wybraną liczbą słówek.</p>
+    </div>
+
+    <div class="help-section">
+      <h3 class="help-section__title">🔁 Powtórki same się przypominają</h3>
+      <p class="hint">Aplikacja zapamiętuje, jak dobrze znasz każde słówko, i sama wylicza kiedy powinna być następna powtórka — nie musisz nic zapisywać, wystarczy uczyć się gdy talia pokazuje zaległe słówka.</p>
+    </div>
+
+    <div class="help-section">
+      <h3 class="help-section__title">🔊 Wymowa</h3>
+      <p class="hint">Przy słówkach w trakcie nauki i w wynikach zobaczysz czasem przycisk głośnika — kliknij, żeby usłyszeć poprawną wymowę angielskiego słowa.</p>
+    </div>
+
+    <div class="help-section">
+      <h3 class="help-section__title">📊 Statystyki</h3>
+      <p class="hint">Ikona wykresu w górnym pasku pokazuje czas nauki, liczbę przerobionych słówek, passę dni z rzędu i skuteczność odpowiedzi.</p>
+    </div>
   </section>
 
 </main>

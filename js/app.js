@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-bulk": "Test zbiorczy",
     "screen-results": "Wyniki",
     "screen-stats": "Statystyki",
+    "screen-help": "Jak korzystać",
   };
   const BACK_TARGET = {
     "screen-import": "screen-home",
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-bulk": "screen-setup",
     "screen-results": "screen-home",
     "screen-stats": "screen-home",
+    "screen-help": "screen-home",
   };
 
   let currentScreenId = "screen-home";
@@ -616,6 +618,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-stats").addEventListener("click", () => {
     renderStats();
     showScreen("screen-stats");
+  });
+
+  document.getElementById("btn-help").addEventListener("click", () => {
+    showScreen("screen-help");
   });
 
   // ===================== UTIL =====================

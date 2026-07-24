@@ -324,3 +324,9 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
 }
 .stats-week__bar { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 0.2s ease; }
 .stats-week__label { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+/* ============ POMOC ============ */
+.help-section { margin-bottom: 22px; }
+.help-section__title { font-size: 0.98rem; font-weight: 700; margin-bottom: 8px; }
+.help-section .hint { margin-bottom: 0; }
+.help-section .hint strong { color: var(--ink); }
