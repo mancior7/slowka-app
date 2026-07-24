@@ -111,6 +111,23 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.welcome-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.welcome-card {
+  background: var(--surface); border-radius: 20px; padding: 28px 24px;
+  max-width: 360px; width: 100%; text-align: center;
+  animation: item-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.welcome-card__emoji { font-size: 2.2rem; margin-bottom: 8px; }
+.welcome-card__title { font-size: 1.3rem; font-weight: 800; margin-bottom: 14px; }
+.welcome-card__text { color: var(--muted); font-size: 0.92rem; margin-bottom: 14px; line-height: 1.5; }
+.welcome-card__text:last-of-type { margin-bottom: 20px; }
+
 .topbar {
   position: sticky; top: 0; z-index: 50;
   display: flex; align-items: center; gap: 12px;

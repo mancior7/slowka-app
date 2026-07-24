@@ -693,6 +693,22 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       splashScreen.classList.add("splash-screen--hidden");
       setTimeout(() => splashScreen.remove(), 550);
+      showWelcomeIfFirstVisit();
     }, showMs);
+  } else {
+    showWelcomeIfFirstVisit();
   }
+
+  // ===================== EKRAN POWITALNY (tylko raz, przy pierwszej wizycie) =====================
+  const WELCOME_SEEN_KEY = "vocab_welcome_seen";
+
+  function showWelcomeIfFirstVisit() {
+    if (localStorage.getItem(WELCOME_SEEN_KEY)) return;
+    document.getElementById("welcome-overlay").hidden = false;
+  }
+
+  document.getElementById("btn-welcome-done").addEventListener("click", () => {
+    localStorage.setItem(WELCOME_SEEN_KEY, "1");
+    document.getElementById("welcome-overlay").hidden = true;
+  });
 });
