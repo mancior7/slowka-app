@@ -19,6 +19,11 @@ const VocabParser = (() => {
       .trim();
     // usuwa wiodące znaczki/numerki przed pierwszą literą
     cleaned = cleaned.replace(/^[^a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+/, "");
+    // te same znaczki trudności czasem trafiają się jako pojedyncza litera "O"/"0"
+    // na początku linii (błędny odczyt okręgu jako litery, nie symbolu) - usuwamy
+    // ją tylko gdy stoi samotnie przed kolejnym słowem, żeby nie ucinać
+    // prawdziwych słów zaczynających się na "O" (np. "Open...")
+    cleaned = cleaned.replace(/^[O0](?=\s+[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż])\s+/, "");
     cleaned = cleaned.replace(/[,;:\s]+$/, "");
     return cleaned.trim();
   }
