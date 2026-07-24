@@ -43,13 +43,31 @@ http("ocrProxy", async (req, res) => {
     });
 
     const data = await visionRes.json();
-    const apiError = data.responses && data.responses[0] && data.responses[0].error;
+
+    // Google zwraca błędy na dwa sposoby: błąd całego zapytania na najwyższym
+    // poziomie (data.error - np. zły klucz, wyłączone rozliczenia, API nie
+    // włączone) albo błąd pojedynczego obrazu w środku (data.responses[0].error).
+    // Pierwotnie sprawdzaliśmy tylko ten drugi, więc błędy najwyższego poziomu
+    // przechodziły niezauważone i kończyło się na pustym tekście.
+    if (data.error) {
+      res.status(502).json({ error: data.error.message || JSON.stringify(data.error) });
+      return;
+    }
+
+    const result = data.responses && data.responses[0];
+    const apiError = result && result.error;
     if (apiError) {
       res.status(502).json({ error: apiError.message });
       return;
     }
 
-    const text = (data.responses && data.responses[0] && data.responses[0].fullTextAnnotation && data.responses[0].fullTextAnnotation.text) || "";
+    // fullTextAnnotation to zwykle najlepsze pole (zachowuje układ wierszy), ale
+    // jako zapasowa opcja bierzemy textAnnotations[0].description - to pole Vision
+    // wypełnia praktycznie zawsze, gdy jakikolwiek tekst zostanie wykryty.
+    const text =
+      (result && result.fullTextAnnotation && result.fullTextAnnotation.text) ||
+      (result && result.textAnnotations && result.textAnnotations[0] && result.textAnnotations[0].description) ||
+      "";
     res.status(200).json({ text });
   } catch (err) {
     res.status(500).json({ error: err.message });
