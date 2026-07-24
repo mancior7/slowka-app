@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-results": "Wyniki",
     "screen-stats": "Statystyki",
     "screen-help": "Jak korzystać",
+    "screen-feedback": "Kontakt",
   };
   const BACK_TARGET = {
     "screen-import": "screen-home",
@@ -24,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "screen-results": "screen-home",
     "screen-stats": "screen-home",
     "screen-help": "screen-home",
+    "screen-feedback": "screen-home",
   };
 
   let currentScreenId = "screen-home";
@@ -622,6 +624,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-help").addEventListener("click", () => {
     showScreen("screen-help");
+  });
+
+  // ===================== KONTAKT / FEEDBACK =====================
+  const FEEDBACK_EMAIL = "wordsnap.feedback@gmail.com";
+  document.getElementById("btn-feedback-email").href = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("WordSnap - zgłoszenie")}`;
+
+  document.getElementById("btn-feedback").addEventListener("click", () => {
+    showScreen("screen-feedback");
+  });
+
+  document.getElementById("btn-copy-email").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(FEEDBACK_EMAIL);
+      const status = document.getElementById("feedback-copy-status");
+      status.hidden = false;
+      setTimeout(() => (status.hidden = true), 2000);
+    } catch {
+      // clipboard API niedostępne - użytkownik i tak widzi adres na ekranie
+    }
   });
 
   // ===================== UTIL =====================

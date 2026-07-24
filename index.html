@@ -23,6 +23,7 @@
   <h1 id="topbar-title">WordSnap</h1>
   <span class="topbar-spacer"></span>
   <button class="icon-btn" id="btn-help" aria-label="Jak korzystać z aplikacji">❓</button>
+  <button class="icon-btn" id="btn-feedback" aria-label="Kontakt i zgłaszanie błędów">✉️</button>
   <button class="icon-btn" id="btn-stats" aria-label="Statystyki nauki">📊</button>
   <button class="icon-btn" id="btn-theme-toggle" aria-label="Zmień motyw (jasny/ciemny)">🌙</button>
 </header>
@@ -251,6 +252,19 @@
       <h3 class="help-section__title">📊 Statystyki</h3>
       <p class="hint">Ikona wykresu w górnym pasku pokazuje czas nauki, liczbę przerobionych słówek, passę dni z rzędu i skuteczność odpowiedzi.</p>
     </div>
+  </section>
+
+  <!-- ===== KONTAKT / FEEDBACK ===== -->
+  <section class="screen" id="screen-feedback">
+    <p class="hint">Znalazłeś błąd, coś nie działa albo masz pomysł na nową funkcję? Napisz — każda wiadomość jest mile widziana.</p>
+
+    <div class="feedback-email-box">
+      <p class="feedback-email">wordsnap.feedback@gmail.com</p>
+      <button class="link-btn" id="btn-copy-email" type="button">📋 Kopiuj adres</button>
+      <p class="feedback-copy-status" id="feedback-copy-status" hidden>Skopiowano adres do schowka.</p>
+    </div>
+
+    <a class="btn btn-primary btn-block" id="btn-feedback-email" href="#">✉️ Napisz maila</a>
   </section>
 
 </main>
