@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.mancior7.wordsnap",
+        "sha256_cert_fingerprints": ["8D:4C:9C:2C:27:5D:9C:91:6E:DE:8D:72:E0:1E:A1:81:64:0C:9E:4E:41:9F:59:84:94:43:E5:60:31:D9:31:7E"]
+      }
+    }]
