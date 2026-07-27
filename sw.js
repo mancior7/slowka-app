@@ -10,9 +10,13 @@ const STATIC_ASSETS = [
   "js/imagesplit.js",
   "js/ocr.js",
   "js/quiz.js",
+  "js/speech.js",
   "js/stats.js",
   "js/app.js",
   "icons/icon.svg",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/icon-maskable-512.png",
 ];
 
 // Wymusza pominięcie zwykłego cache'u HTTP przeglądarki (nie tylko Cache Storage) -
