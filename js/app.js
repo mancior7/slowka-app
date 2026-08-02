@@ -484,17 +484,28 @@ document.addEventListener("DOMContentLoaded", () => {
     feedbackBox.hidden = false;
     feedbackBox.classList.add(correct ? "correct" : "wrong");
     document.getElementById("feedback-text").textContent = correct ? "Dobrze! ✓" : `Poprawna odpowiedź: ${expected}`;
+    // na telefonie klawiatura potrafi zasłaniać ten fragment ekranu - dosuwamy go
+    // w widoczny obszar, żeby nie wyglądało jakby kliknięcie "Sprawdź" nic nie zrobiło
+    feedbackBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   document.getElementById("btn-check-answer").addEventListener("click", () => {
     const input = document.getElementById("typing-input");
     if (input.disabled) return;
+    // zamyka klawiaturę w ramach tego samego działania co sprawdzenie odpowiedzi,
+    // zamiast pozwolić telefonowi zrobić to osobno (np. przez własny znaczek ✓ nad
+    // klawiaturą, który sam w sobie nic w apce nie wysyła)
+    input.blur();
     const { correct, expected } = state.session.answerTyping(input.value);
     input.disabled = true;
     showFeedback(correct, expected);
   });
 
   document.getElementById("typing-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("btn-check-answer").click();
+  });
+  // niektóre klawiatury mobilne nie wysyłają keydown dla Enter/Gotowe, tylko keyup
+  document.getElementById("typing-input").addEventListener("keyup", (e) => {
     if (e.key === "Enter") document.getElementById("btn-check-answer").click();
   });
 

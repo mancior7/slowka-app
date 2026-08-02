@@ -6,6 +6,7 @@ const VocabQuiz = (() => {
       .toLowerCase()
       .trim()
       .replace(/\s+/g, " ")
+      .replace(/\s*\/\s*/g, "/") // "a / b" i "a/b" mają się liczyć tak samo
       .replace(/[ąćęłńóśźż]/g, (ch) => DIACRITICS[ch] || ch);
   }
 
@@ -29,7 +30,9 @@ const VocabQuiz = (() => {
   // "wkład (w coś)" (dopowiedzenie w nawiasie) - każdy z tych wariantów ma być
   // zaliczony jako poprawna odpowiedź, nie tylko dokładnie cały napis.
   function expandAlternatives(expected) {
-    return expected
+    const whole = expected.trim();
+    const wholeWithoutParens = whole.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+    const parts = expected
       .split(/[,;/]/)
       .map((s) => s.trim())
       .filter(Boolean)
@@ -37,6 +40,11 @@ const VocabQuiz = (() => {
         const withoutParens = s.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
         return withoutParens && withoutParens !== s ? [s, withoutParens] : [s];
       });
+    // odpowiedź dokładnie taka jak cały, niepodzielony napis też zawsze się liczy -
+    // dla wpisów typu "złożyć/anulować zamówienie" (jedna odpowiedź złożona z dwóch
+    // członów) dzielenie na "/" dawało same fragmenty, z którymi nic wpisanego w
+    // całości nigdy nie mogło się zgodzić
+    return [whole, wholeWithoutParens, ...parts].filter(Boolean);
   }
 
   function checkAnswer(userAnswer, expected) {
