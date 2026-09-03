@@ -281,11 +281,6 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   font-size: 1.1rem; text-align: center; margin-bottom: 14px;
 }
 .typing-input:focus { outline: none; border-color: var(--accent); }
-.dictation-hint {
-  font-size: 0.8rem; color: var(--muted); line-height: 1.4;
-  margin: -4px 0 14px; text-align: center;
-}
-#dictation-hint-bulk { margin: -6px 0 14px; }
 .reveal-answer { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin: 16px 0; animation: item-in 0.3s ease; }
 .flash-actions { display: flex; gap: 10px; margin-top: 6px; }
 .flash-actions .btn { flex: 1; }

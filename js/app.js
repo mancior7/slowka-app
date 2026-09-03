@@ -358,7 +358,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderBulkScreen() {
     document.getElementById("bulk-instruction").textContent = BULK_INSTRUCTIONS[state.selectedDirection];
-    document.getElementById("dictation-hint-bulk").hidden = false;
 
     const isRandom = state.selectedDirection === "random";
     const list = document.getElementById("bulk-list");
@@ -461,7 +460,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const input = document.getElementById("typing-input");
       input.value = "";
       input.disabled = false;
-      document.getElementById("dictation-hint-typing").hidden = false;
       setTimeout(() => input.focus(), 50);
     } else if (session.mode === "flashcard") {
       document.getElementById("reveal-answer").hidden = true;
