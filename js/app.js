@@ -359,6 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderBulkScreen() {
     document.getElementById("bulk-instruction").textContent = BULK_INSTRUCTIONS[state.selectedDirection];
+    setMicStatus(document.getElementById("mic-status-bulk"), "", false);
 
     const isRandom = state.selectedDirection === "random";
     const micSupported = VocabSpeechInput.supported;
@@ -384,6 +385,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const micStatusBulk = document.getElementById("mic-status-bulk");
+
   // w teście zbiorczym nie ma sprawdzania pojedynczej odpowiedzi (jest jedno
   // "Sprawdź wszystko" na końcu), więc mikrofon tylko wpisuje tekst do wiersza
   document.getElementById("bulk-list").addEventListener("click", (e) => {
@@ -399,12 +402,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     document.querySelectorAll(".bulk-row__mic.listening").forEach((b) => setMicState(b, false));
     setMicState(btn, true);
+    setMicStatus(micStatusBulk, `Słucham (wiersz ${i + 1})…`, false);
     VocabSpeechInput.listen(recognitionLangFor(item.direction), {
       onResult: (text) => {
+        setMicStatus(micStatusBulk, "", false);
         input.value = text;
         input.focus();
       },
-      onError: micPermissionAlert,
+      onNoMatch: () => setMicStatus(micStatusBulk, micErrorMessage("no-speech"), true),
+      onError: (err) => setMicStatus(micStatusBulk, micErrorMessage(err), true),
       onEnd: () => setMicState(btn, false),
     });
   });
@@ -478,13 +484,31 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.textContent = listening ? "🔴" : "🎤";
   }
 
-  function micPermissionAlert(err) {
-    if (err === "not-allowed" || err === "service-not-allowed") {
-      alert("Brak dostępu do mikrofonu. Włącz uprawnienie do mikrofonu dla tej strony w ustawieniach przeglądarki.");
-    }
+  function setMicStatus(el, msg, isError) {
+    if (!el) return;
+    el.textContent = msg || "";
+    el.hidden = !msg;
+    el.classList.toggle("mic-status--error", !!isError);
+  }
+
+  // zamienia surowy kod błędu z Web Speech API na komunikat po polsku
+  function micErrorMessage(err) {
+    const map = {
+      "not-allowed": "Brak zgody na mikrofon — włącz dostęp do mikrofonu dla tej strony w ustawieniach przeglądarki.",
+      "service-not-allowed": "Przeglądarka zablokowała rozpoznawanie mowy. W zainstalowanej aplikacji może nie działać — spróbuj otworzyć stronę w Chrome.",
+      "no-speech": "Nie usłyszałem nic — spróbuj jeszcze raz, głośniej i bliżej mikrofonu.",
+      "audio-capture": "Nie znaleziono mikrofonu.",
+      "network": "Rozpoznawanie mowy wymaga internetu — sprawdź połączenie.",
+      "aborted": "Przerwano.",
+      "language-not-supported": "Ten język nie jest wspierany przez rozpoznawanie mowy w tej przeglądarce.",
+      "brak-wsparcia": "Ta przeglądarka nie obsługuje rozpoznawania mowy.",
+    };
+    return map[err] || ("Rozpoznawanie mowy nie zadziałało (" + err + ").");
   }
 
   if (!VocabSpeechInput.supported && micTypingBtn) micTypingBtn.remove();
+
+  const micStatusTyping = document.getElementById("mic-status-typing");
 
   if (micTypingBtn) {
     micTypingBtn.addEventListener("click", () => {
@@ -496,13 +520,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       setMicState(micTypingBtn, true);
+      setMicStatus(micStatusTyping, "Słucham… powiedz słówko", false);
       VocabSpeechInput.listen(recognitionLangFor(q.direction), {
         onResult: (text) => {
+          setMicStatus(micStatusTyping, "", false);
           input.value = text;
           // użytkownik wybrał "wpisz i od razu sprawdź" - zatwierdzamy jak Enter
           document.getElementById("btn-check-answer").click();
         },
-        onError: micPermissionAlert,
+        onNoMatch: () => setMicStatus(micStatusTyping, micErrorMessage("no-speech"), true),
+        onError: (err) => setMicStatus(micStatusTyping, micErrorMessage(err), true),
         onEnd: () => setMicState(micTypingBtn, false),
       });
     });
@@ -538,6 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (micTypingBtn) {
         VocabSpeechInput.stop();
         setMicState(micTypingBtn, false);
+        setMicStatus(micStatusTyping, "", false);
         micTypingBtn.hidden = false;
         micTypingBtn.disabled = false;
       }

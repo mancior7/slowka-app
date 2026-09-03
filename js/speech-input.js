@@ -1,7 +1,9 @@
 // Rozpoznawanie mowy przez wbudowany silnik przeglądarki (Web Speech API) -
 // pozwala wypowiedzieć odpowiedź zamiast ją wpisywać. Działa dobrze w Chrome/Edge
-// (także na Androidzie), słabiej lub wcale w Safari - dlatego cała funkcja chowa
-// się, gdy `supported` jest false, i reszta aplikacji działa jak dawniej.
+// (także na Androidzie), słabiej lub wcale w Safari i w zainstalowanych apkach
+// opartych o WebView - dlatego cała funkcja chowa się, gdy `supported` jest
+// false, a błędy są przekazywane na wierzch (onError / onNoMatch), żeby dało się
+// je zdiagnozować na telefonie.
 const VocabSpeechInput = (() => {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const supported = !!SR;
@@ -10,8 +12,11 @@ const VocabSpeechInput = (() => {
 
   // lang: kod języka OCZEKIWANEJ odpowiedzi ("pl-PL" albo "en-US"), bo to jej
   // ma słuchać silnik - przy losowym kierunku pytań zmienia się co słówko.
-  function listen(lang, { onResult, onError, onEnd } = {}) {
-    if (!supported) return null;
+  function listen(lang, { onStart, onResult, onError, onNoMatch, onEnd } = {}) {
+    if (!supported) {
+      if (onError) onError("brak-wsparcia");
+      return null;
+    }
     stop();
 
     const rec = new SR();
@@ -20,24 +25,40 @@ const VocabSpeechInput = (() => {
     rec.maxAlternatives = 1;
     rec.continuous = false;
 
+    let gotResult = false;
+    let gotError = false;
+
+    rec.onstart = () => {
+      if (onStart) onStart();
+    };
     rec.onresult = (e) => {
       const text = (e.results[0] && e.results[0][0] ? e.results[0][0].transcript : "").trim();
-      if (text && onResult) onResult(text);
+      if (text) {
+        gotResult = true;
+        if (onResult) onResult(text);
+      }
     };
     rec.onerror = (e) => {
-      if (onError) onError(e.error);
+      gotError = true;
+      if (onError) onError(e.error || "nieznany");
     };
     rec.onend = () => {
       if (active === rec) active = null;
+      // silnik potrafi zakończyć sesję bez żadnego wyniku i bez błędu (np. gdy
+      // nic nie usłyszał albo mowa była za cicha) - inaczej wygląda to jakby
+      // kliknięcie mikrofonu nic nie zrobiło
+      if (!gotResult && !gotError && onNoMatch) onNoMatch();
       if (onEnd) onEnd();
     };
 
     active = rec;
     try {
       rec.start();
-    } catch (_) {
-      // start() rzuca, jeśli poprzednia sesja jeszcze nie zdążyła się zamknąć -
-      // onend z tamtej i tak posprząta stan przycisku.
+    } catch (err) {
+      active = null;
+      if (onError) onError("start: " + (err && err.message ? err.message : err));
+      if (onEnd) onEnd();
+      return null;
     }
     return rec;
   }
