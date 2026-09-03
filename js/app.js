@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let screenLeaveTimeout = null;
   function showScreen(id) {
+    if (window.VocabSpeechInput) VocabSpeechInput.stop();
     const next = screens[id];
     const prev = screens[currentScreenId];
     if (screenLeaveTimeout) {
@@ -360,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("bulk-instruction").textContent = BULK_INSTRUCTIONS[state.selectedDirection];
 
     const isRandom = state.selectedDirection === "random";
+    const micSupported = VocabSpeechInput.supported;
     const list = document.getElementById("bulk-list");
     list.innerHTML = "";
     state.bulkSession.items.forEach((item, i) => {
@@ -369,14 +371,43 @@ document.addEventListener("DOMContentLoaded", () => {
       const dirTag = isRandom
         ? `<span class="bulk-row__dir">${item.direction === "en2pl" ? "→ PL" : "→ EN"}</span>`
         : "";
+      const micBtn = micSupported
+        ? `<button class="bulk-row__mic" data-i="${i}" type="button" aria-label="Powiedz odpowiedź">🎤</button>`
+        : "";
       row.innerHTML = `
         <span class="bulk-row__num">${i + 1}.</span>
         <span class="bulk-row__prompt">${escapeHtml(item.prompt)} ${dirTag}</span>
         <input type="text" class="bulk-row__input" data-i="${i}" autocomplete="off" autocapitalize="off" spellcheck="false" />
+        ${micBtn}
       `;
       list.appendChild(row);
     });
   }
+
+  // w teście zbiorczym nie ma sprawdzania pojedynczej odpowiedzi (jest jedno
+  // "Sprawdź wszystko" na końcu), więc mikrofon tylko wpisuje tekst do wiersza
+  document.getElementById("bulk-list").addEventListener("click", (e) => {
+    const btn = e.target.closest(".bulk-row__mic");
+    if (!btn || !state.bulkSession) return;
+    const i = +btn.dataset.i;
+    const item = state.bulkSession.items[i];
+    const input = document.querySelector(`.bulk-row__input[data-i="${i}"]`);
+    if (!item || !input) return;
+    if (btn.classList.contains("listening")) {
+      VocabSpeechInput.stop();
+      return;
+    }
+    document.querySelectorAll(".bulk-row__mic.listening").forEach((b) => setMicState(b, false));
+    setMicState(btn, true);
+    VocabSpeechInput.listen(recognitionLangFor(item.direction), {
+      onResult: (text) => {
+        input.value = text;
+        input.focus();
+      },
+      onError: micPermissionAlert,
+      onEnd: () => setMicState(btn, false),
+    });
+  });
 
   document.getElementById("btn-bulk-submit").addEventListener("click", () => {
     const inputs = document.querySelectorAll(".bulk-row__input");
@@ -432,6 +463,50 @@ document.addEventListener("DOMContentLoaded", () => {
     choice: document.getElementById("mode-choice"),
   };
   const feedbackBox = document.getElementById("answer-feedback");
+  const micTypingBtn = document.getElementById("btn-mic-typing");
+
+  // język rozpoznawania mowy = język oczekiwanej odpowiedzi. Przy kierunku
+  // "en2pl" pytanie jest po angielsku, a odpowiedź (i to, czego słucha mikrofon)
+  // po polsku - i odwrotnie.
+  function recognitionLangFor(direction) {
+    return direction === "en2pl" ? "pl-PL" : "en-US";
+  }
+
+  function setMicState(btn, listening) {
+    if (!btn) return;
+    btn.classList.toggle("listening", listening);
+    btn.textContent = listening ? "🔴" : "🎤";
+  }
+
+  function micPermissionAlert(err) {
+    if (err === "not-allowed" || err === "service-not-allowed") {
+      alert("Brak dostępu do mikrofonu. Włącz uprawnienie do mikrofonu dla tej strony w ustawieniach przeglądarki.");
+    }
+  }
+
+  if (!VocabSpeechInput.supported && micTypingBtn) micTypingBtn.remove();
+
+  if (micTypingBtn) {
+    micTypingBtn.addEventListener("click", () => {
+      const q = state.session && state.session.current();
+      const input = document.getElementById("typing-input");
+      if (!q || input.disabled) return;
+      if (micTypingBtn.classList.contains("listening")) {
+        VocabSpeechInput.stop();
+        return;
+      }
+      setMicState(micTypingBtn, true);
+      VocabSpeechInput.listen(recognitionLangFor(q.direction), {
+        onResult: (text) => {
+          input.value = text;
+          // użytkownik wybrał "wpisz i od razu sprawdź" - zatwierdzamy jak Enter
+          document.getElementById("btn-check-answer").click();
+        },
+        onError: micPermissionAlert,
+        onEnd: () => setMicState(micTypingBtn, false),
+      });
+    });
+  }
 
   function renderQuestion() {
     const session = state.session;
@@ -460,6 +535,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const input = document.getElementById("typing-input");
       input.value = "";
       input.disabled = false;
+      if (micTypingBtn) {
+        VocabSpeechInput.stop();
+        setMicState(micTypingBtn, false);
+        micTypingBtn.hidden = false;
+        micTypingBtn.disabled = false;
+      }
       setTimeout(() => input.focus(), 50);
     } else if (session.mode === "flashcard") {
       document.getElementById("reveal-answer").hidden = true;
@@ -496,6 +577,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // zamiast pozwolić telefonowi zrobić to osobno (np. przez własny znaczek ✓ nad
     // klawiaturą, który sam w sobie nic w apce nie wysyła)
     input.blur();
+    if (micTypingBtn) {
+      VocabSpeechInput.stop();
+      setMicState(micTypingBtn, false);
+      micTypingBtn.disabled = true;
+    }
     const { correct, expected } = state.session.answerTyping(input.value);
     input.disabled = true;
     showFeedback(correct, expected);

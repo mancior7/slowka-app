@@ -1,4 +1,4 @@
-const CACHE_NAME = "slowka-v1";
+const CACHE_NAME = "slowka-v2";
 const STATIC_ASSETS = [
   "./",
   "index.html",
@@ -11,6 +11,7 @@ const STATIC_ASSETS = [
   "js/ocr.js",
   "js/quiz.js",
   "js/speech.js",
+  "js/speech-input.js",
   "js/stats.js",
   "js/app.js",
   "icons/icon.svg",

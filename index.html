@@ -170,7 +170,10 @@
       </div>
 
       <div id="mode-typing" class="mode-panel">
-        <input type="text" id="typing-input" class="typing-input" placeholder="Wpisz odpowiedź" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" />
+        <div class="typing-row">
+          <input type="text" id="typing-input" class="typing-input" placeholder="Wpisz odpowiedź" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" />
+          <button class="mic-btn" id="btn-mic-typing" type="button" aria-label="Powiedz odpowiedź" hidden>🎤</button>
+        </div>
         <button class="btn btn-primary btn-block" id="btn-check-answer">Sprawdź</button>
       </div>
 
@@ -259,6 +262,11 @@
     </div>
 
     <div class="help-section">
+      <h3 class="help-section__title">🎤 Odpowiedź głosem</h3>
+      <p class="hint">W trybach <strong>Test pisany</strong> i <strong>Zbiorczo</strong> obok pola odpowiedzi pojawia się przycisk mikrofonu (jeśli przeglądarka go obsługuje — najlepiej Chrome). Kliknij i wypowiedz słówko zamiast je wpisywać. Aplikacja rozpoznaje mowę w języku, w którym akurat ma być odpowiedź — polskim albo angielskim. W teście pisanym odpowiedź jest od razu sprawdzana.</p>
+    </div>
+
+    <div class="help-section">
       <h3 class="help-section__title">📊 Statystyki</h3>
       <p class="hint">Ikona wykresu w górnym pasku pokazuje czas nauki, liczbę przerobionych słówek, passę dni z rzędu i skuteczność odpowiedzi.</p>
     </div>
@@ -287,6 +295,7 @@
 <script src="js/ocr.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/speech.js"></script>
+<script src="js/speech-input.js"></script>
 <script src="js/stats.js"></script>
 <script src="js/app.js"></script>
 </body>
