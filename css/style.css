@@ -281,37 +281,11 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   font-size: 1.1rem; text-align: center; margin-bottom: 14px;
 }
 .typing-input:focus { outline: none; border-color: var(--accent); }
-.typing-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.typing-row .typing-input { flex: 1; min-width: 0; margin-bottom: 0; }
-
-/* ============ MIKROFON (odpowiedź głosem) ============ */
-.mic-btn {
-  width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%;
-  border: none; background: var(--bg); font-size: 1.25rem; line-height: 1;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--accent); transition: transform 0.12s ease, background-color 0.15s ease;
+.dictation-hint {
+  font-size: 0.8rem; color: var(--muted); line-height: 1.4;
+  margin: -4px 0 14px; text-align: center;
 }
-.mic-btn:active { transform: scale(0.88); }
-.bulk-row__mic {
-  width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%;
-  border: none; background: var(--bg); font-size: 1rem; line-height: 1;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--accent); transition: transform 0.12s ease, background-color 0.15s ease;
-}
-.bulk-row__mic:active { transform: scale(0.88); }
-.mic-btn.listening, .bulk-row__mic.listening {
-  background: var(--danger-bg); color: var(--danger);
-  animation: mic-pulse 1.1s ease-in-out infinite;
-}
-@keyframes mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.45); }
-  50% { box-shadow: 0 0 0 9px rgba(192, 57, 43, 0); }
-}
-.mic-status {
-  font-size: 0.82rem; color: var(--muted); text-align: center;
-  margin: 4px 0 12px; min-height: 1.1em;
-}
-.mic-status.mic-status--error { color: var(--danger); }
+#dictation-hint-bulk { margin: -6px 0 14px; }
 .reveal-answer { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin: 16px 0; animation: item-in 0.3s ease; }
 .flash-actions { display: flex; gap: 10px; margin-top: 6px; }
 .flash-actions .btn { flex: 1; }
