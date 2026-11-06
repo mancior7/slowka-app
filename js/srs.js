@@ -1,8 +1,18 @@
 // Lekka wersja algorytmu SM-2 (jak w Anki, uproszczona).
 // quality: 2 = źle, 4 = dobrze, 5 = dobrze i łatwo.
 const VocabSRS = (() => {
+  // Bez górnego limitu przerwa rosła wykładniczo (przy ease 2.8 po ~19 poprawnych
+  // odpowiedziach to dziesiątki milionów dni), data powtórki wychodziła poza zakres
+  // i toISOString() rzucało wyjątek, który przerywał sprawdzanie odpowiedzi w połowie.
+  const MAX_INTERVAL_DAYS = 365;
+
   function review(word, quality) {
-    let { interval, ease, reps, lapses } = word;
+    // słówka, które już mają zapisane absurdalne lub uszkodzone wartości, też się naprawiają
+    const num = (v, fallback) => (Number.isFinite(v) ? v : fallback);
+    let interval = Math.min(num(word.interval, 0), MAX_INTERVAL_DAYS);
+    let ease = num(word.ease, 2.5);
+    let reps = num(word.reps, 0);
+    let lapses = num(word.lapses, 0);
 
     if (quality < 3) {
       lapses += 1;
@@ -17,6 +27,7 @@ const VocabSRS = (() => {
       ease = Math.min(2.8, ease + (quality === 5 ? 0.1 : 0));
     }
 
+    interval = Math.min(interval, MAX_INTERVAL_DAYS);
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + interval);
 
