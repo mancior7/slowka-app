@@ -469,10 +469,10 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (session.mode === "choice") {
       const list = document.getElementById("choices-list");
       list.innerHTML = "";
-      q.choices.forEach((choice, i) => {
+      q.choices.forEach((choice) => {
         const btn = document.createElement("button");
-        btn.className = "choice-btn stagger-item";
-        btn.style.setProperty("--i", Math.min(i, 10));
+        // bez animacji wejścia: przyciski odpowiedzi muszą być zawsze widoczne i klikalne
+        btn.className = "choice-btn";
         btn.textContent = choice;
         btn.addEventListener("click", () => handleChoiceAnswer(btn, choice));
         list.appendChild(btn);

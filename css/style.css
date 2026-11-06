@@ -76,9 +76,10 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* "backwards" zamiast bazowego opacity:0 + "forwards": jeśli animacja się zawiesi
+   albo nie wystartuje (zdarza się w WebKit na iPhonie), element i tak jest widoczny */
 .stagger-item {
-  opacity: 0;
-  animation: item-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: item-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
@@ -286,7 +287,7 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
 .flash-actions .btn { flex: 1; }
 .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .choice-btn {
-  border: 1px solid var(--border); background: var(--bg); border-radius: 10px; padding: 14px 10px; font-size: 0.95rem; font-weight: 600;
+  border: 1px solid var(--border); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 14px 10px; font-size: 0.95rem; font-weight: 600;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.12s ease;
 }
 .choice-btn:active:not(:disabled) { transform: scale(0.96); }
